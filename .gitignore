@@ -1,2 +1,5 @@
 venv/
 .env
+selenium_whatsapp_profile/
+*.pyc
+*.ipynb
