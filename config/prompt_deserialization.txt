@@ -4,11 +4,11 @@ Your task:
 Given text describing one or more real estate units or offers, extract structured information for each apartment or unit.
 
 For each unit, extract (if available):
-1. region — e.g., "القاهرة الجديدة", "الشيخ زايد", etc.
+1. region — (could be one of these strictly "sheikh zayed", "new cairo", "masr elgedida", "maadi", "new capital)
 2. area — in square meters (float)
 3. price — in EGP (integer or float)
-4. payment_plan — full text of the payment or installment plan
-5. type — e.g., "شقة", "دوبلكس", "بنتهاوس", etc.
+4. payment_plan — full text of the payment or installment plan with a rigid format e.g. (x% DP -x% after x years over x years) or (x% DP over x years)
+5. type — stick with (apartment, villa, twin house, town house, duplex) if any thing else not known null it
 6. n_rooms — number of rooms (integer)
 7. insertion_date (date of the message)
 8. project (name of the project)
@@ -18,10 +18,7 @@ For each unit, extract (if available):
 
 Return your output **strictly as valid JSON**, with this structure:
 
-{
-  "units": {
-    "units_count": <number of units>,
-    "units_info": [
+  [
       {
         "region": "...",
         "area": ...,
@@ -35,8 +32,7 @@ Return your output **strictly as valid JSON**, with this structure:
         "installments" : ...
       }
     ]
-  }
-}
+
 
 Notes:
 - Any missing field don't return it (return only tne available fields)

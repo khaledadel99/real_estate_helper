@@ -7,7 +7,7 @@ from utils.logger import timing
 
 
 def fix_date(v) -> Optional[date]:
-    """Only accept dd-mm-yyyy date strings."""
+    """Accept both dd-mm-yyyy and yyyy-mm-dd date strings."""
     if v in (None, "", "-"):
         return None
     if isinstance(v, date):
@@ -15,24 +15,27 @@ def fix_date(v) -> Optional[date]:
     if isinstance(v, datetime):
         return v.date()
     if isinstance(v, str):
-        s = v.strip()
-        s = s.replace("/", "-")
-        s = s.translate(str.maketrans("٠١٢٣٤٥٦٧٨٩", "0123456789"))  # convert Arabic digits to English
+        s = v.strip().replace("/", "-")
+        s = s.translate(str.maketrans("٠١٢٣٤٥٦٧٨٩", "0123456789"))  # convert Arabic digits
 
-        try:
-            # only this format is allowed
-            return datetime.strptime(s, "%d-%m-%Y").date()
-        except ValueError:
-            raise ValueError(
-                f"Invalid date format '{v}'. Expected format: dd-mm-yyyy (e.g., 11-01-2025)"
-            )
+        for fmt in ("%d-%m-%Y", "%Y-%m-%d"):  # 👈 allow both orders
+            try:
+                return datetime.strptime(s, fmt).date()
+            except ValueError:
+                continue
+
+        raise ValueError(
+            f"Invalid date format '{v}'. Expected format: dd-mm-yyyy or yyyy-mm-dd (e.g., 11-01-2025)"
+        )
 
     raise ValueError(f"Invalid date type: {type(v)}")
+
 
 
 class MessageSchema(BaseModel):
     area: float | None = None
     price: float | None = None
+    region: str | None = None
     payment_plan: str | None = None
     type: str | None = None
     n_rooms: int | None = None

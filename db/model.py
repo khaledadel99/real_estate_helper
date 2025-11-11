@@ -9,6 +9,7 @@ class units(Base):
 
     id = Column(Integer, primary_key=True, index=True)
     area = Column(Float)
+    region = Column(String)
     price = Column(Float)
     payment_plan = Column(String)
     type = Column(String)
@@ -17,4 +18,5 @@ class units(Base):
     project = Column(String)
     down_payment = Column(Integer)
     installments = Column(Integer)
+    installment_value = Column(Float) 
     

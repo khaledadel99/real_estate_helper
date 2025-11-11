@@ -17,8 +17,8 @@ def timing(func):
         try:
             result = func(*args, **kwargs)
             return result
-        except:
-            logging.warning(f"error with {func.__name__} ")
+        except Exception as e:
+            logging.warning(f"error with {func.__name__} : {e}")
         finally:
             elapsed = time.time() - start_time
             logging.info(f"Finished '{func.__name__} 'in {elapsed:.2f} seconds")

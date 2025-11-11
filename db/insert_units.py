@@ -27,11 +27,21 @@ def insert_units(orm_units: list[MessageSchema]):
               AND a.n_rooms IS NOT DISTINCT FROM b.n_rooms
               AND a.project IS NOT DISTINCT FROM b.project
               AND a.down_payment IS NOT DISTINCT FROM b.down_payment
-              AND a.installments IS NOT DISTINCT FROM b.installments                          
+              AND a.installments IS NOT DISTINCT FROM b.installments       
+              AND a.region IS NOT DISTINCT FROM b.region                                
             ;
         """)
         db.execute(dedup_query)
-        db.commit()          
+        db.commit()     
+
+        update_query = text("""
+            UPDATE units
+            SET installment_value = ROUND((price - down_payment) / installments)
+            WHERE price IS NOT NULL AND down_payment IS NOT NULL;
+        """)
+        db.execute(update_query)
+        db.commit()
+     
         logging.info(f"Inserted {len(orm_units)} rows into 'units' table.")
     except Exception as e:
         db.rollback()

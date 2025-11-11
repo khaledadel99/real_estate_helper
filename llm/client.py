@@ -17,8 +17,10 @@ class LLMClient:
         self.client = genai.Client(api_key=api_key)
         self.model = model
         with open("config\prompt_deserialization.txt" , "r", encoding="utf-8-sig") as f :
-            self.raw_deserial = f.read()
-    
+            self.prompt_extracting = f.read()
+
+        with open("config\prompt_generate_query.txt" , "r", encoding="utf-8-sig") as f :
+            self.prompt_query = f.read()
     @timing
     def extract_structured_data(self, text: str) -> dict:
         """
@@ -29,7 +31,7 @@ class LLMClient:
             model=self.model,
             contents=property_data,
             config=types.GenerateContentConfig(
-                system_instruction=self.raw_deserial, 
+                system_instruction=self.prompt_extracting, 
                 temperature=0.0
             ),
         )
@@ -40,5 +42,24 @@ class LLMClient:
 
         # parse the JSON text into a Python dictionary
         data = json.loads(clean_json)
-        return data["units"]
+        return data
+    
+    @timing
+    def generate_query(self, text: str) -> dict:
+        """
+        Generate a valid query based on free text input.
+        """
+        property_data = text
+        response = self.client.models.generate_content(
+            model=self.model,
+            contents=property_data,
+            config=types.GenerateContentConfig(
+                system_instruction=self.prompt_query, 
+                temperature=0.0
+            ),
+        )
+        query = response.candidates[0].content.parts[0].text
+
+        # remove the ```json ... ``` wrapper if present
+        return query
 
