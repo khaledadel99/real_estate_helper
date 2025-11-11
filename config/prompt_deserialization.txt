@@ -10,6 +10,11 @@ For each unit, extract (if available):
 4. payment_plan — full text of the payment or installment plan
 5. type — e.g., "شقة", "دوبلكس", "بنتهاوس", etc.
 6. n_rooms — number of rooms (integer)
+7. insertion_date (date of the message)
+8. project (name of the project)
+9. down_payment (10 means 10%)
+10. installments (in months)
+
 
 Return your output **strictly as valid JSON**, with this structure:
 
@@ -24,11 +29,16 @@ Return your output **strictly as valid JSON**, with this structure:
         "payment_plan": "...",
         "type": "...",
         "n_rooms": ...
+        "insertion_date": ...
+        "project": ...
+        "down_payment": ...
+        "installments" : ...
       }
     ]
   }
 }
 
 Notes:
-- All fields are optional (nullable) if not present.
+- Any missing field don't return it (return only tne available fields)
 - Output must be raw JSON only — no Markdown, no explanations, no code fences.
+- Not every message can contain a unit info, maybe a trash/unrelated data

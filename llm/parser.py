@@ -1,17 +1,65 @@
 # llm/parsers.py
-from pydantic import BaseModel, Field, ValidationError
-from typing import Optional, Dict
-from datetime import datetime
+from typing import Optional, List
+from pydantic import BaseModel, ValidationError, RootModel, field_validator
+from datetime import datetime, date
+from db.model import units
+from utils.logger import timing
+
+
+def fix_date(v) -> Optional[date]:
+    """Only accept dd-mm-yyyy date strings."""
+    if v in (None, "", "-"):
+        return None
+    if isinstance(v, date):
+        return v
+    if isinstance(v, datetime):
+        return v.date()
+    if isinstance(v, str):
+        s = v.strip()
+        s = s.replace("/", "-")
+        s = s.translate(str.maketrans("٠١٢٣٤٥٦٧٨٩", "0123456789"))  # convert Arabic digits to English
+
+        try:
+            # only this format is allowed
+            return datetime.strptime(s, "%d-%m-%Y").date()
+        except ValueError:
+            raise ValueError(
+                f"Invalid date format '{v}'. Expected format: dd-mm-yyyy (e.g., 11-01-2025)"
+            )
+
+    raise ValueError(f"Invalid date type: {type(v)}")
+
 
 class MessageSchema(BaseModel):
-    sender: str
-    intent: str
-    entities: Dict[str, str] = Field(default_factory=dict)
-    timestamp: Optional[datetime] = None
+    area: float | None = None
+    price: float | None = None
+    payment_plan: str | None = None
+    type: str | None = None
+    n_rooms: int | None = None
+    insertion_date: date | None = None
+    project: str | None = None
+    down_payment: int | None = None
+    installments: int | None = None
 
-def validate_message(raw_json: dict) -> Optional[MessageSchema]:
+    @field_validator("insertion_date", mode="plain")
+    def _parse_strict_date(cls, v):
+        return fix_date(v)
+
+    def to_orm(self) -> units:
+        """Convert this Pydantic object into a SQLAlchemy Unit ORM object."""
+        data = self.model_dump()
+        return units(**data)
+
+
+class MessageListSchema(RootModel[List[MessageSchema]]):
+    pass
+
+
+@timing
+def validate_messages(raw_dict_list: list[dict]) -> list[MessageSchema]:
     try:
-        return MessageSchema(**raw_json)
+        validated = MessageListSchema(raw_dict_list)
+        return validated.root
     except ValidationError as e:
-        print(f"⚠️ Validation failed: {e}")
-        return None
+        print(f"Validation failed for list:\n{e}\n")
+        return []

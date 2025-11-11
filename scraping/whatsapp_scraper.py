@@ -11,7 +11,8 @@ from selenium.webdriver.common.keys import Keys
 from webdriver_manager.chrome import ChromeDriverManager
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
-
+from config.chats import *
+from utils.logger import *
 
 def setup_selenium():
     load_dotenv()
@@ -82,7 +83,10 @@ def scrape_recent_messages(driver, limit=20):
 
         # Try all possible selectors for text
         message_text = msg.text
-        meta_div = msg.find_element(By.XPATH, ".//div[contains(@class, 'copyable-text')]")
+        try :
+            meta_div = msg.find_element(By.XPATH, ".//div[contains(@class, 'copyable-text')]")
+        except : 
+            continue
         date_raw = meta_div.get_attribute("data-pre-plain-text")
 
 
@@ -109,10 +113,9 @@ def save_chat_results(base_dir, chat_name, chat_data_dicts):
         chat_data_dicts (list[dict]): List of messages (each message is a dict).
     """
     today_str = date.today().strftime("%Y-%m-%d")
-
+    print(chat_data_dicts)
     # Sanitize chat folder name (remove invalid filesystem characters)
     safe_chat_name = chat_name.replace(" ","_")
-    print("safe :", safe_chat_name)
     chat_folder = os.path.join(base_dir, safe_chat_name)
     print("folder :", chat_folder)
     # Create folder if not exists
@@ -125,10 +128,11 @@ def save_chat_results(base_dir, chat_name, chat_data_dicts):
         json.dump(chat_data_dicts, f, ensure_ascii=False, indent=2)
 
 
-
-def main_scraping(chats = None) :
-    if not chats :
-        chats = ["Modon & First Step"]
+@timing
+def main_scraping(search_chats = None) :
+    if not search_chats :
+        search_chats = chats
+        
     result = []
 
     try : 
@@ -140,5 +144,6 @@ def main_scraping(chats = None) :
             result.append(messages)
             save_chat_results("exported_chats", chat, messages)
     finally:
-        driver.quit()
-    return messages
+        # driver.quit()
+        None
+    return result
