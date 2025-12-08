@@ -15,3 +15,75 @@ Here you can find a flowchart that represents briefly the pipeline
 - `config/`: Configuration files and text prompts for the LLM.
 
 
+## Setup & Installation
+
+### Prerequisites
+
+- Python 3.11+
+- PostgreSQL database
+- Google GenAI API Key
+
+### Environment Variables
+
+Create a `.env` file in the root directory (based on `.env.example` if available) with the following variables:
+
+```env
+# Google GenAI
+API_KEY=your_google_api_key
+
+# Database Connection
+DB_USER=postgres
+DB_PASSWORD=your_password
+DB_HOST=localhost
+DB_PORT=5432
+DB_NAME=postgres
+```
+
+### Running Locally
+
+1.  **Clone the repository**:
+    ```bash
+    git clone <repository_url>
+    cd project
+    ```
+
+2.  **Create a virtual environment**:
+    ```bash
+    python -m venv venv
+    source venv/bin/activate  # On Windows: venv\Scripts\activate
+    ```
+
+3.  **Install dependencies**:
+    ```bash
+    pip install -r requirements.txt
+    ```
+
+4.  **Run the application**:
+    ```bash
+    uvicorn main:app --reload
+    ```
+
+    The API will be available at `http://localhost:8000`.
+
+### Running with Docker
+
+1.  **Build the Docker image**:
+    ```bash
+    docker build -t real-estate-helper .
+    ```
+
+2.  **Run the container**:
+    ```bash
+    docker run -p 8000:8000 --env-file .env real-estate-helper
+    ```
+
+## API Endpoints
+
+### `POST /scrape`
+Triggers the scraping process to collect new real estate data.
+- **Returns**: Status and number of inserted records.
+
+### `POST /ask`
+Queries the database using natural language.
+- **Parameters**: `question` (string)
+- **Returns**: The generated SQL query, number of units found, and a natural language answer.
