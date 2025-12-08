@@ -16,13 +16,22 @@ class LLMClient:
             api_key = os.getenv("API_KEY")
         self.client = genai.Client(api_key=api_key)
         self.model = model
-        with open("config\prompt_deserialization.txt" , "r", encoding="utf-8-sig") as f :
+
+        BASE_DIR = os.path.dirname(os.path.abspath(__file__))
+        CONFIG_DIR = os.path.join(BASE_DIR, "..", "config") 
+        prompt_deserialization = os.path.join(CONFIG_DIR, "prompt_deserialization.txt")
+        prompt_generate_query = os.path.join(CONFIG_DIR, "prompt_generate_query.txt")
+        prompt_convert_output = os.path.join(CONFIG_DIR, "prompt_convert_output.txt")
+
+
+
+        with open(prompt_deserialization, "r", encoding="utf-8-sig") as f :
             self.prompt_extracting = f.read()
 
-        with open("config\prompt_generate_query.txt" , "r", encoding="utf-8-sig") as f :
+        with open(prompt_generate_query, "r", encoding="utf-8-sig") as f :
             self.prompt_query = f.read()
         
-        with open("config\prompt_convert_output.txt" , "r", encoding="utf-8-sig") as f :
+        with open(prompt_convert_output, "r", encoding="utf-8-sig") as f :
             self.prompt_convert_output = f.read()
 
     @timing
