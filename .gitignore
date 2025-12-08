@@ -3,3 +3,4 @@ venv/
 selenium_whatsapp_profile/
 *.pyc
 *.ipynb
+uvicorn
