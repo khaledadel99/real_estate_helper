@@ -64,7 +64,6 @@ DB_NAME=postgres
     uvicorn main:app --reload
     ```
 
-    The API will be available at `http://localhost:8000`.
 
 ### Running with Docker
 
