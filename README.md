@@ -77,7 +77,9 @@ DB_NAME=postgres
     ```bash
     docker run -p 8000:8000 --env-file .env real-estate-helper
     ```
-
+    
+    Either ways the API will be available at `http://localhost:8000`.
+    
 ## API Endpoints
 
 ### `POST /scrape`
