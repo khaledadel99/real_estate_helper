@@ -4,6 +4,7 @@ from pydantic import BaseModel, ValidationError, RootModel, field_validator
 from datetime import datetime, date
 from db.model import units
 from utils.logger import timing
+import logging
 
 
 def fix_date(v) -> Optional[date]:
@@ -37,12 +38,13 @@ class MessageSchema(BaseModel):
     price: float | None = None
     region: str | None = None
     payment_plan: str | None = None
-    type: str | None = None
+    apartment_type: str | None = None
     n_rooms: int | None = None
     insertion_date: date | None = None
     project: str | None = None
     down_payment: int | None = None
     installments: int | None = None
+    installment_value: float | None = None
 
     @field_validator("insertion_date", mode="plain")
     def _parse_strict_date(cls, v):

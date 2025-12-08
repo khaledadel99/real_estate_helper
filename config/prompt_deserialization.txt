@@ -8,7 +8,7 @@ For each unit, extract (if available):
 2. area — in square meters (float)
 3. price — in EGP (integer or float)
 4. payment_plan — full text of the payment or installment plan with a rigid format e.g. (x% DP -x% after x years over x years) or (x% DP over x years)
-5. type — stick with (apartment, villa, twin house, town house, duplex) if any thing else not known null it
+5. apartment_type — stick with (apartment, villa, twin house, town house, duplex) if any thing else not known null it
 6. n_rooms — number of rooms (integer)
 7. insertion_date (date of the message)
 8. project (name of the project)
@@ -24,7 +24,7 @@ Return your output **strictly as valid JSON**, with this structure:
         "area": ...,
         "price": ...,
         "payment_plan": "...",
-        "type": "...",
+        "apartment_type": "...",
         "n_rooms": ...
         "insertion_date": ...
         "project": ...

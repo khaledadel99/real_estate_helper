@@ -13,6 +13,7 @@ from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
 from config.chats import *
 from utils.logger import *
+import logging
 
 def setup_selenium():
     load_dotenv()
@@ -21,7 +22,7 @@ def setup_selenium():
 
     options = webdriver.ChromeOptions()
     options.add_argument(f"user-data-dir={CHROME_PROFILE}")
-    options.add_argument("--headless=new")          # run without opening browser window
+    # options.add_argument("--headless=new")          # run without opening browser window
     options.add_argument("--disable-gpu")
     options.add_argument("--no-sandbox")
     options.add_argument("--window-size=1920,1080")
@@ -33,7 +34,7 @@ def setup_selenium():
     return driver
 
 def wait_for_whatsapp_loaded(driver, timeout=600):
-    print("Waiting for WhatsApp to load...")
+    logging.info("Waiting for WhatsApp to load...")
     WebDriverWait(driver, timeout).until(
         EC.presence_of_element_located((By.ID, "pane-side"))
     )
@@ -113,17 +114,14 @@ def save_chat_results(base_dir, chat_name, chat_data_dicts):
         chat_data_dicts (list[dict]): List of messages (each message is a dict).
     """
     today_str = date.today().strftime("%Y-%m-%d")
-    print(chat_data_dicts)
     # Sanitize chat folder name (remove invalid filesystem characters)
     safe_chat_name = chat_name.replace(" ","_")
     chat_folder = os.path.join(base_dir, safe_chat_name)
-    print("folder :", chat_folder)
     # Create folder if not exists
     os.makedirs(chat_folder, exist_ok=True)
 
     # Create JSON file with today's date
     json_path = os.path.join(chat_folder, f"{today_str}.json")
-    print("folder json :", json_path)
     with open(json_path, "w", encoding="utf-8") as f:
         json.dump(chat_data_dicts, f, ensure_ascii=False, indent=2)
 
@@ -142,7 +140,7 @@ def main_scraping(search_chats = None) :
             search_and_open_chat(driver, chat)
             messages = scrape_recent_messages(driver, limit=20)
             result.append(messages)
-            save_chat_results("exported_chats", chat, messages)
+            save_chat_results("data\exported_chats", chat, messages)
     finally:
         # driver.quit()
         None

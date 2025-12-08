@@ -21,6 +21,10 @@ class LLMClient:
 
         with open("config\prompt_generate_query.txt" , "r", encoding="utf-8-sig") as f :
             self.prompt_query = f.read()
+        
+        with open("config\prompt_convert_output.txt" , "r", encoding="utf-8-sig") as f :
+            self.prompt_convert_output = f.read()
+
     @timing
     def extract_structured_data(self, text: str) -> dict:
         """
@@ -62,4 +66,29 @@ class LLMClient:
 
         # remove the ```json ... ``` wrapper if present
         return query
+    
+    @timing
+    def convert_output(self, text: list[dict]) -> str:
+        """
+        Convert a list of units into a friendly Arabic text.
+        """
+        cleaned = []
+        for unit in text:
+            unit_copy = unit.copy()
+            unit_copy.pop("insertion_date", None)  # remove safely if exists
+            cleaned.append(unit_copy)
+            
+        property_data = json.dumps(cleaned)
+        response = self.client.models.generate_content(
+            model=self.model,
+            contents=property_data,
+            config=types.GenerateContentConfig(
+                system_instruction=self.prompt_convert_output, 
+                temperature=0.0
+            ),
+        )
+        text = response.candidates[0].content.parts[0].text
+
+        # remove the ```json ... ``` wrapper if present
+        return text
 
