@@ -11,10 +11,6 @@ llm = LLMClient()
 @app.post("/scrape")
 def scrape_data():
     try:
-        return {
-            "status": "success",
-            "inserted_records": "testing"
-        }
         from scraping.whatsapp_scraper import main_scraping
         
         raw_data = main_scraping()
@@ -34,13 +30,8 @@ def scrape_data():
 @app.post("/ask")
 def ask_question(question: str):
     try:
-        return {
-            "sql_query": None,
-            "units_found": 0,
-            "answer": "testing"
-        }
         query = llm.generate_query(question)
-        units = retrieve_units(query)
+        units = retrieve_units(query, duration=300)
         final_answer = llm.convert_output(units)
 
         return {
